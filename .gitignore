@@ -1,1 +1,131 @@
-/target
+# Rust
+/target/
+**/*.rs.bk
+*. pdb
+
+# Cargo build artifacts
+debug/
+target/
+
+# Backup files
+*.swp
+*.swo
+*~
+*. bak
+*. tmp
+*.orig
+
+# macOS
+.DS_Store
+. AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs. db
+Desktop.ini
+$RECYCLE.BIN/
+*. lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# IDEs and Editors
+# VSCode
+.vscode/
+*. code-workspace
+
+# IntelliJ/CLion/RustRover
+.idea/
+*. iml
+*.iws
+*. ipr
+. idea_modules/
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+.netrwhist
+
+# Emacs
+\#*\#
+/. emacs.desktop
+/.emacs.desktop.lock
+*. elc
+auto-save-list
+tramp
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# JetBrains
+.fleet/
+
+# Configuration files that might contain sensitive data
+# (users should copy . example versions)
+config. toml
+crabmail.toml
+.crabmail/
+*. local. toml
+
+# Test data
+test_emails/
+test_data/
+*. eml
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Cache directories
+.cache/
+cache/
+
+# Documentation builds
+/book/
+/docs/_build/
+
+# Profiling data
+*. profdata
+*.gcda
+*.gcno
+perf.data*
+flamegraph.svg
+massif.out.*
+
+# Code coverage
+*. profraw
+/coverage/
+lcov.info
+cobertura. xml
+
+# Benchmark results
+criterion/
+bench_results/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Security - Never commit these!
+secrets.toml
+credentials.json
+*.key
+*.pem
+*.p12
+*.pfx
+keyring_test/
