@@ -1,3 +1,5 @@
+use std::time::{Duration, Instant};
+
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::style::{Color, Style};
@@ -15,6 +17,7 @@ pub struct StatusBar {
     pub message_count: u32,
     pub status: String,
     pub error: String,
+    status_expires: Option<Instant>,
 }
 
 impl StatusBar {
@@ -26,6 +29,22 @@ impl StatusBar {
             message_count: 0,
             status: String::new(),
             error: String::new(),
+            status_expires: None,
+        }
+    }
+
+    pub fn set_temporary_status(&mut self, msg: &str, duration: Duration) {
+        self.status = msg.to_string();
+        self.error.clear();
+        self.status_expires = Some(Instant::now() + duration);
+    }
+
+    pub fn tick(&mut self) {
+        if let Some(expires) = self.status_expires {
+            if Instant::now() >= expires {
+                self.status.clear();
+                self.status_expires = None;
+            }
         }
     }
 }

@@ -89,6 +89,7 @@ impl App {
         }
 
         loop {
+            self.status_bar.tick();
             self.sync_component_state();
             terminal.draw(|frame| self.render(frame))?;
 
@@ -135,7 +136,7 @@ impl App {
                 self.pending_confirm.take().unwrap()
             } else {
                 self.pending_confirm = None;
-                self.status_bar.status = "Cancelled".to_string();
+                self.status_bar.set_temporary_status("Cancelled", Duration::from_secs(2));
                 Action::Noop
             };
         }
@@ -390,7 +391,7 @@ impl App {
                 match client.list_mailboxes().await {
                     Ok(mailboxes) => {
                         self.mailbox_list.set_mailboxes(mailboxes);
-                        self.status_bar.status = "Connected".to_string();
+                        self.status_bar.set_temporary_status("Connected", Duration::from_secs(2));
                     }
                     Err(e) => {
                         self.status_bar.error = format!("Failed to list mailboxes: {e}");
@@ -412,7 +413,13 @@ impl App {
                 self.status_bar.mailbox = info.name;
                 self.status_bar.message_count = info.exists;
                 match imap.fetch_headers(50).await {
-                    Ok(msgs) => self.message_list.set_messages(msgs),
+                    Ok(msgs) => {
+                        self.message_list.set_messages(msgs);
+                        self.status_bar.set_temporary_status(
+                            "Refreshed",
+                            Duration::from_secs(2),
+                        );
+                    }
                     Err(e) => self.status_bar.error = format!("Fetch error: {e}"),
                 }
             }
@@ -455,7 +462,7 @@ impl App {
         .await
         {
             Ok(()) => {
-                self.status_bar.status = "Message sent!".to_string();
+                self.status_bar.set_temporary_status("Message sent!", Duration::from_secs(2));
                 self.composer.clear();
             }
             Err(e) => self.status_bar.error = format!("Send failed: {e}"),
@@ -466,7 +473,7 @@ impl App {
         let Some(imap) = &mut self.imap else { return };
         match imap.delete_message(uid).await {
             Ok(()) => {
-                self.status_bar.status = "Message deleted".to_string();
+                self.status_bar.set_temporary_status("Message deleted", Duration::from_secs(2));
                 if self.mode == Mode::Reading {
                     self.mode = Mode::Normal;
                     self.reader.close();
@@ -485,13 +492,16 @@ impl App {
         match imap.search(query).await {
             Ok(uids) => {
                 if uids.is_empty() {
-                    self.status_bar.status = "No results".to_string();
+                    self.status_bar.set_temporary_status("No results", Duration::from_secs(2));
                     self.message_list.set_messages(vec![]);
                     return;
                 }
                 match imap.fetch_headers_by_uids(&uids).await {
                     Ok(msgs) => {
-                        self.status_bar.status = format!("{} results", msgs.len());
+                        self.status_bar.set_temporary_status(
+                            &format!("{} results", msgs.len()),
+                            Duration::from_secs(2),
+                        );
                         self.message_list.set_messages(msgs);
                     }
                     Err(e) => self.status_bar.error = format!("Search fetch error: {e}"),
