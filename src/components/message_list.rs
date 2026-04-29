@@ -1,3 +1,4 @@
+use chrono::{DateTime, Datelike, Local};
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Rect};
@@ -92,8 +93,8 @@ impl Component for MessageList {
                 Row::new(vec![
                     flag.to_string(),
                     truncate(&m.from, 25),
-                    truncate(&m.subject, 40),
-                    truncate(&m.date, 20),
+                    m.subject.clone(),
+                    format_date(&m.date),
                 ])
             })
             .collect();
@@ -108,7 +109,7 @@ impl Component for MessageList {
             Constraint::Length(2),
             Constraint::Length(25),
             Constraint::Fill(1),
-            Constraint::Length(20),
+            Constraint::Length(18),
         ];
 
         let table = Table::new(rows, widths)
@@ -137,5 +138,21 @@ fn truncate(s: &str, max: usize) -> String {
         format!("{}…", &s[..max - 1])
     } else {
         s.to_string()
+    }
+}
+
+fn format_date(raw: &str) -> String {
+    if let Ok(parsed) = DateTime::parse_from_rfc2822(raw.trim()) {
+        let local = parsed.with_timezone(&Local);
+        let today = Local::now().date_naive();
+        if local.date_naive() == today {
+            format!("Today {}", local.format("%H:%M"))
+        } else if local.date_naive().year() == today.year() {
+            local.format("%b %d %H:%M").to_string()
+        } else {
+            local.format("%Y-%m-%d %H:%M").to_string()
+        }
+    } else {
+        raw.to_string()
     }
 }

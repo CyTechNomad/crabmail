@@ -34,6 +34,9 @@ keyring = { version = "3", features = ["apple-native"] }
 mail-parser = "0.9"
 html2text = "0.12"
 
+# Date/time
+chrono = "0.4"
+
 # Error handling & logging
 anyhow = "1"
 tracing = "0.1"
