@@ -34,6 +34,8 @@ pub enum Action {
     // Message actions
     DeleteMessage(u32),
     ConfirmDelete(u32),
+    // Refresh
+    RefreshMailbox,
     // Status
     SetStatus(String),
     SetError(String),

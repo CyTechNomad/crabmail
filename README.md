@@ -62,6 +62,7 @@ Configuration is stored at `~/.config/crabmail/config.toml`.
 | `i`         | Compose new email                      |
 | `/`         | Search                                 |
 | `:`         | Command mode                           |
+| `r`         | Refresh mailbox                        |
 | `d`         | Delete message (press `y` to confirm)  |
 | `Esc`       | Back / cancel                          |
 | `q`         | Quit                                   |

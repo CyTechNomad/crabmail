@@ -149,6 +149,7 @@ impl App {
             KeyCode::Char(':') => Action::StartCommand,
             KeyCode::Char('/') => Action::StartSearch,
             KeyCode::Char('i') => Action::StartCompose,
+            KeyCode::Char('r') => Action::RefreshMailbox,
             KeyCode::Char('h') => Action::FocusMailboxes,
             KeyCode::Char('l') => Action::FocusMessages,
             _ => match self.focus {
@@ -285,6 +286,12 @@ impl App {
             }
             Action::EnterNormal => {
                 self.mode = Mode::Normal;
+            }
+            Action::RefreshMailbox => {
+                if let Some(name) = self.mailbox_list.selected_name() {
+                    self.status_bar.status = "Refreshing…".to_string();
+                    self.select_mailbox(&name).await;
+                }
             }
             Action::SetStatus(s) => {
                 // Setup wizard completion
