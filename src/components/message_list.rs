@@ -1,9 +1,10 @@
 use chrono::{DateTime, Datelike, Local};
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
-use ratatui::layout::{Constraint, Rect};
+use ratatui::layout::{Alignment, Constraint, Rect};
 use ratatui::style::{Color, Modifier, Style};
-use ratatui::widgets::{Block, Borders, Row, Table, TableState};
+use ratatui::text::Text;
+use ratatui::widgets::{Block, Borders, Cell, Row, Table, TableState};
 
 use crate::action::Action;
 use crate::components::Component;
@@ -90,11 +91,13 @@ impl Component for MessageList {
                 } else {
                     "●"
                 };
+                let (date, time) = format_date(&m.date);
                 Row::new(vec![
-                    flag.to_string(),
-                    truncate(&m.from, 25),
-                    m.subject.clone(),
-                    format_date(&m.date),
+                    Cell::new(flag),
+                    Cell::new(truncate(&m.from, 25)),
+                    Cell::new(m.subject.clone()),
+                    Cell::new(Text::from(date).alignment(Alignment::Right)),
+                    Cell::new(time),
                 ])
             })
             .collect();
@@ -109,7 +112,8 @@ impl Component for MessageList {
             Constraint::Length(2),
             Constraint::Length(25),
             Constraint::Fill(1),
-            Constraint::Length(18),
+            Constraint::Length(10),
+            Constraint::Length(5),
         ];
 
         let table = Table::new(rows, widths)
@@ -120,7 +124,7 @@ impl Component for MessageList {
                     .title(" Messages "),
             )
             .header(
-                Row::new(vec!["", "From", "Subject", "Date"])
+                Row::new(vec!["", "From", "Subject", "Date", ""])
                     .style(Style::default().fg(Color::DarkGray)),
             )
             .row_highlight_style(
@@ -141,18 +145,19 @@ fn truncate(s: &str, max: usize) -> String {
     }
 }
 
-fn format_date(raw: &str) -> String {
+fn format_date(raw: &str) -> (String, String) {
     if let Ok(parsed) = DateTime::parse_from_rfc2822(raw.trim()) {
         let local = parsed.with_timezone(&Local);
         let today = Local::now().date_naive();
-        if local.date_naive() == today {
-            format!("Today {}", local.format("%H:%M"))
+        let date = if local.date_naive() == today {
+            "Today".into()
         } else if local.date_naive().year() == today.year() {
-            local.format("%b %d %H:%M").to_string()
+            local.format("%b %d").to_string()
         } else {
-            local.format("%Y-%m-%d %H:%M").to_string()
-        }
+            local.format("%Y-%m-%d").to_string()
+        };
+        (date, local.format("%H:%M").to_string())
     } else {
-        raw.to_string()
+        (raw.to_string(), String::new())
     }
 }
