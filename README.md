@@ -101,6 +101,9 @@ Configuration is stored at `~/.config/crabmail/config.toml`.
 Config lives at `~/.config/crabmail/config.toml`:
 
 ```toml
+# Auto-refresh mailbox every N seconds (optional, omit to disable)
+auto_refresh_seconds = 120
+
 [[accounts]]
 name = "Personal"
 email = "you@example.com"

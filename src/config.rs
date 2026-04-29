@@ -31,6 +31,8 @@ fn default_true() -> bool {
 pub struct Config {
     #[serde(default)]
     pub accounts: Vec<Account>,
+    #[serde(default)]
+    pub auto_refresh_seconds: Option<u64>,
 }
 
 impl Config {

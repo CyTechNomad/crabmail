@@ -2,7 +2,7 @@ use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::DefaultTerminal;
 use ratatui::layout::{Constraint, Layout};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use crate::action::Action;
 use crate::auth;
@@ -54,6 +54,7 @@ pub struct App {
     setup_wizard: SetupWizard,
     pending_confirm: Option<Action>,
     should_quit: bool,
+    last_refresh: Instant,
 }
 
 impl App {
@@ -75,6 +76,7 @@ impl App {
             setup_wizard: SetupWizard::new(),
             pending_confirm: None,
             should_quit: false,
+            last_refresh: Instant::now(),
         }
     }
 
@@ -105,6 +107,11 @@ impl App {
                 }
                 let action = self.handle_key(key);
                 self.process_action(action).await;
+            } else if let Some(secs) = self.config.auto_refresh_seconds {
+                if secs > 0 && self.last_refresh.elapsed() >= Duration::from_secs(secs) {
+                    self.last_refresh = Instant::now();
+                    self.process_action(Action::RefreshMailbox).await;
+                }
             }
         }
         Ok(())
@@ -289,6 +296,7 @@ impl App {
             }
             Action::RefreshMailbox => {
                 if let Some(name) = self.mailbox_list.selected_name() {
+                    self.last_refresh = Instant::now();
                     self.status_bar.status = "Refreshing…".to_string();
                     self.select_mailbox(&name).await;
                 }
