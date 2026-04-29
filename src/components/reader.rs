@@ -94,7 +94,9 @@ impl Component for Reader {
             Span::styled("Date: ", Style::default().add_modifier(Modifier::BOLD)),
             Span::raw(&msg.date),
         ]));
-        lines.push(Line::from("─".repeat(area.width.saturating_sub(2) as usize)));
+        lines.push(Line::from(
+            "─".repeat(area.width.saturating_sub(2) as usize),
+        ));
 
         let body = msg.display_body(area.width.saturating_sub(2) as usize);
         for line in body.lines() {

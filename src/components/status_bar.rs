@@ -69,10 +69,7 @@ impl Component for StatusBar {
         let mb_span = Span::styled(mb, Style::default().fg(Color::Gray));
 
         let right = if !self.error.is_empty() {
-            Span::styled(
-                format!(" {} ", self.error),
-                Style::default().fg(Color::Red),
-            )
+            Span::styled(format!(" {} ", self.error), Style::default().fg(Color::Red))
         } else if !self.status.is_empty() {
             Span::styled(
                 format!(" {} ", self.status),

@@ -125,12 +125,14 @@ impl Component for Composer {
                 .title(format!(" {title} "))
         };
 
-        let to_p = Paragraph::new(self.to.as_str())
-            .block(make_block("To", self.field == Field::To));
+        let to_p =
+            Paragraph::new(self.to.as_str()).block(make_block("To", self.field == Field::To));
         let subj_p = Paragraph::new(self.subject.as_str())
             .block(make_block("Subject", self.field == Field::Subject));
-        let body_p = Paragraph::new(self.body.as_str())
-            .block(make_block("Body [C-w:send Esc:cancel]", self.field == Field::Body));
+        let body_p = Paragraph::new(self.body.as_str()).block(make_block(
+            "Body [C-w:send Esc:cancel]",
+            self.field == Field::Body,
+        ));
 
         frame.render_widget(to_p, chunks[0]);
         frame.render_widget(subj_p, chunks[1]);

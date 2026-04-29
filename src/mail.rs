@@ -42,13 +42,11 @@ pub fn parse_message(raw: &[u8]) -> Result<ParsedMessage> {
             a.as_list()
                 .map(|list| {
                     list.iter()
-                        .map(|addr| {
-                            match (addr.name(), addr.address()) {
-                                (Some(n), Some(a)) => format!("{n} <{a}>"),
-                                (None, Some(a)) => a.to_string(),
-                                (Some(n), None) => n.to_string(),
-                                _ => String::new(),
-                            }
+                        .map(|addr| match (addr.name(), addr.address()) {
+                            (Some(n), Some(a)) => format!("{n} <{a}>"),
+                            (None, Some(a)) => a.to_string(),
+                            (Some(n), None) => n.to_string(),
+                            _ => String::new(),
                         })
                         .collect::<Vec<_>>()
                         .join(", ")
@@ -63,12 +61,10 @@ pub fn parse_message(raw: &[u8]) -> Result<ParsedMessage> {
             a.as_list()
                 .map(|list| {
                     list.iter()
-                        .map(|addr| {
-                            match (addr.name(), addr.address()) {
-                                (Some(n), Some(a)) => format!("{n} <{a}>"),
-                                (None, Some(a)) => a.to_string(),
-                                _ => String::new(),
-                            }
+                        .map(|addr| match (addr.name(), addr.address()) {
+                            (Some(n), Some(a)) => format!("{n} <{a}>"),
+                            (None, Some(a)) => a.to_string(),
+                            _ => String::new(),
                         })
                         .collect::<Vec<_>>()
                         .join(", ")
@@ -92,28 +88,16 @@ pub fn parse_message(raw: &[u8]) -> Result<ParsedMessage> {
         .unwrap_or_default();
 
     let subject = msg.subject().unwrap_or_default().to_string();
-    let date = msg
-        .date()
-        .map(|d| d.to_rfc3339())
-        .unwrap_or_default();
+    let date = msg.date().map(|d| d.to_rfc3339()).unwrap_or_default();
 
-    let text_body = msg
-        .body_text(0)
-        .map(|t| t.to_string())
-        .unwrap_or_default();
+    let text_body = msg.body_text(0).map(|t| t.to_string()).unwrap_or_default();
 
-    let html_body = msg
-        .body_html(0)
-        .map(|h| h.to_string())
-        .unwrap_or_default();
+    let html_body = msg.body_html(0).map(|h| h.to_string()).unwrap_or_default();
 
     let attachments = msg
         .attachments()
         .map(|a| Attachment {
-            name: a
-                .attachment_name()
-                .unwrap_or("unnamed")
-                .to_string(),
+            name: a.attachment_name().unwrap_or("unnamed").to_string(),
             size: a.len(),
         })
         .collect();

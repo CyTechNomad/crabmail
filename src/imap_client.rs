@@ -56,7 +56,10 @@ impl ImapClient {
             .login(&account.email, password)
             .await
             .map_err(|e| anyhow::anyhow!("IMAP login failed: {}", e.0))?;
-        Ok(Self { session, selected_exists: 0 })
+        Ok(Self {
+            session,
+            selected_exists: 0,
+        })
     }
 
     pub async fn list_mailboxes(&mut self) -> Result<Vec<Mailbox>> {
@@ -73,7 +76,9 @@ impl ImapClient {
                     .iter()
                     .any(|a| matches!(a, async_imap::types::NameAttribute::NoSelect))
             })
-            .map(|n| Mailbox { name: n.name().to_string() })
+            .map(|n| Mailbox {
+                name: n.name().to_string(),
+            })
             .collect())
     }
 
@@ -149,7 +154,11 @@ impl ImapClient {
         if uids.is_empty() {
             return Ok(vec![]);
         }
-        let uid_str: String = uids.iter().map(|u| u.to_string()).collect::<Vec<_>>().join(",");
+        let uid_str: String = uids
+            .iter()
+            .map(|u| u.to_string())
+            .collect::<Vec<_>>()
+            .join(",");
         let fetches: Vec<_> = self
             .session
             .uid_fetch(&uid_str, "(UID FLAGS RFC822.HEADER)")
@@ -184,7 +193,11 @@ impl ImapClient {
             .await?
             .try_collect::<Vec<_>>()
             .await?;
-        self.session.expunge().await?.try_collect::<Vec<_>>().await?;
+        self.session
+            .expunge()
+            .await?
+            .try_collect::<Vec<_>>()
+            .await?;
         self.selected_exists = self.selected_exists.saturating_sub(1);
         Ok(())
     }

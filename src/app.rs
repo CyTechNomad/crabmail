@@ -1,11 +1,12 @@
 use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use ratatui::layout::{Constraint, Layout};
 use ratatui::DefaultTerminal;
+use ratatui::layout::{Constraint, Layout};
 use std::time::Duration;
 
 use crate::action::Action;
 use crate::auth;
+use crate::components::Component;
 use crate::components::command_bar::{self, CommandBar};
 use crate::components::composer::Composer;
 use crate::components::mailbox_list::MailboxList;
@@ -14,7 +15,6 @@ use crate::components::reader::Reader;
 use crate::components::search::Search;
 use crate::components::setup_wizard::SetupWizard;
 use crate::components::status_bar::StatusBar;
-use crate::components::Component;
 use crate::config::Config;
 use crate::imap_client::ImapClient;
 use crate::mail;
@@ -217,7 +217,10 @@ impl App {
                     };
                     let body = format!(
                         "\n\n---------- Forwarded message ----------\nFrom: {}\nDate: {}\nSubject: {}\n\n{}",
-                        msg.from, msg.date, msg.subject, msg.display_body(80)
+                        msg.from,
+                        msg.date,
+                        msg.subject,
+                        msg.display_body(80)
                     );
                     self.composer.prefill("", &subject, &body);
                     self.mode = Mode::Compose;
@@ -329,8 +332,8 @@ impl App {
             self.reader.render(frame, content_area);
         } else {
             // Two-pane: mailboxes | messages
-            let panes =
-                Layout::horizontal([Constraint::Length(25), Constraint::Fill(1)]).split(content_area);
+            let panes = Layout::horizontal([Constraint::Length(25), Constraint::Fill(1)])
+                .split(content_area);
             self.mailbox_list.render(frame, panes[0]);
             self.message_list.render(frame, panes[1]);
         }
@@ -508,7 +511,12 @@ impl App {
         }
 
         // Update existing or add new
-        let idx = if let Some(pos) = self.config.accounts.iter().position(|a| a.name == account.name) {
+        let idx = if let Some(pos) = self
+            .config
+            .accounts
+            .iter()
+            .position(|a| a.name == account.name)
+        {
             self.config.accounts[pos] = account;
             pos
         } else {
