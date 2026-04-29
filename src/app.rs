@@ -373,12 +373,15 @@ impl App {
             self.status_bar.error = "Account not found".to_string();
             return;
         };
-        let password = match auth::get_password(&account.name) {
-            Ok(p) => p,
-            Err(e) => {
-                self.status_bar.error = format!("Keychain error: {e}");
-                return;
-            }
+        let password = match self.cached_password.clone() {
+            Some(p) => p,
+            None => match auth::get_password(&account.name) {
+                Ok(p) => p,
+                Err(e) => {
+                    self.status_bar.error = format!("Keychain error: {e}");
+                    return;
+                }
+            },
         };
         self.cached_password = Some(password.clone());
         self.status_bar.status = format!("Connecting to {}...", account.imap_host);

@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use async_imap::Session;
 use futures::TryStreamExt;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tokio::net::TcpStream;
 use tokio_rustls::TlsConnector;
 use tokio_rustls::client::TlsStream;
@@ -9,6 +9,23 @@ use tokio_rustls::rustls::{ClientConfig, RootCertStore};
 use tokio_util::compat::{Compat, TokioAsyncReadCompatExt};
 
 use crate::config::Account;
+
+fn tls_config() -> Result<Arc<ClientConfig>> {
+    static TLS_CONFIG: OnceLock<Arc<ClientConfig>> = OnceLock::new();
+    if let Some(cfg) = TLS_CONFIG.get() {
+        return Ok(cfg.clone());
+    }
+    let mut root_store = RootCertStore::empty();
+    for cert in rustls_native_certs::load_native_certs()? {
+        root_store.add(cert)?;
+    }
+    let config = Arc::new(
+        ClientConfig::builder()
+            .with_root_certificates(root_store)
+            .with_no_client_auth(),
+    );
+    Ok(TLS_CONFIG.get_or_init(|| config.clone()).clone())
+}
 
 #[derive(Debug, Clone)]
 pub struct Mailbox {
@@ -38,14 +55,7 @@ pub struct ImapClient {
 
 impl ImapClient {
     pub async fn connect(account: &Account, password: &str) -> Result<Self> {
-        let mut root_store = RootCertStore::empty();
-        for cert in rustls_native_certs::load_native_certs()? {
-            root_store.add(cert)?;
-        }
-        let config = ClientConfig::builder()
-            .with_root_certificates(root_store)
-            .with_no_client_auth();
-        let connector = TlsConnector::from(Arc::new(config));
+        let connector = TlsConnector::from(tls_config()?);
         let tcp = TcpStream::connect((&*account.imap_host, account.imap_port)).await?;
         let server_name =
             tokio_rustls::rustls::pki_types::ServerName::try_from(account.imap_host.as_str())?
