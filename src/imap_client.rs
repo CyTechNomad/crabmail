@@ -178,6 +178,17 @@ impl ImapClient {
         Ok(summaries)
     }
 
+    pub async fn delete_message(&mut self, uid: u32) -> Result<()> {
+        self.session
+            .uid_store(uid.to_string(), "+FLAGS (\\Deleted)")
+            .await?
+            .try_collect::<Vec<_>>()
+            .await?;
+        self.session.expunge().await?.try_collect::<Vec<_>>().await?;
+        self.selected_exists = self.selected_exists.saturating_sub(1);
+        Ok(())
+    }
+
     pub async fn logout(&mut self) -> Result<()> {
         self.session.logout().await?;
         Ok(())

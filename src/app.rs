@@ -52,6 +52,7 @@ pub struct App {
     command_bar: CommandBar,
     status_bar: StatusBar,
     setup_wizard: SetupWizard,
+    pending_confirm: Option<Action>,
     should_quit: bool,
 }
 
@@ -72,6 +73,7 @@ impl App {
             command_bar: CommandBar::new(),
             status_bar: StatusBar::new(),
             setup_wizard: SetupWizard::new(),
+            pending_confirm: None,
             should_quit: false,
         }
     }
@@ -120,6 +122,17 @@ impl App {
     }
 
     fn handle_key(&mut self, key: KeyEvent) -> Action {
+        // Confirm overlay — intercept next keypress without changing mode
+        if self.pending_confirm.is_some() {
+            return if matches!(key.code, KeyCode::Char('y')) {
+                self.pending_confirm.take().unwrap()
+            } else {
+                self.pending_confirm = None;
+                self.status_bar.status = "Cancelled".to_string();
+                Action::Noop
+            };
+        }
+
         match self.mode {
             Mode::Setup => self.setup_wizard.handle_key_event(key),
             Mode::Command => self.command_bar.handle_key_event(key),
@@ -260,6 +273,13 @@ impl App {
                 self.setup_wizard.activate();
                 self.mode = Mode::Setup;
             }
+            Action::DeleteMessage(uid) => {
+                self.delete_message(uid).await;
+            }
+            Action::ConfirmDelete(uid) => {
+                self.pending_confirm = Some(Action::DeleteMessage(uid));
+                self.status_bar.status = "Delete message? (y/n)".to_string();
+            }
             Action::EnterNormal => {
                 self.mode = Mode::Normal;
             }
@@ -384,7 +404,7 @@ impl App {
         match imap.fetch_raw_message(uid).await {
             Ok(raw) => match mail::parse_message(&raw) {
                 Ok(parsed) => {
-                    self.reader.open(parsed);
+                    self.reader.open(uid, parsed);
                     self.mode = Mode::Reading;
                 }
                 Err(e) => self.status_bar.error = format!("Parse error: {e}"),
@@ -418,6 +438,24 @@ impl App {
                 self.composer.clear();
             }
             Err(e) => self.status_bar.error = format!("Send failed: {e}"),
+        }
+    }
+
+    async fn delete_message(&mut self, uid: u32) {
+        let Some(imap) = &mut self.imap else { return };
+        match imap.delete_message(uid).await {
+            Ok(()) => {
+                self.status_bar.status = "Message deleted".to_string();
+                if self.mode == Mode::Reading {
+                    self.mode = Mode::Normal;
+                    self.reader.close();
+                }
+                // Refresh current mailbox
+                if let Some(name) = self.mailbox_list.selected_name() {
+                    self.select_mailbox(&name).await;
+                }
+            }
+            Err(e) => self.status_bar.error = format!("Delete failed: {e}"),
         }
     }
 

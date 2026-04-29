@@ -31,6 +31,9 @@ pub enum Action {
     SwitchAccount(String),
     EditAccount,
     AddAccount,
+    // Message actions
+    DeleteMessage(u32),
+    ConfirmDelete(u32),
     // Status
     SetStatus(String),
     SetError(String),

@@ -11,6 +11,7 @@ use crate::mail::ParsedMessage;
 
 pub struct Reader {
     pub message: Option<ParsedMessage>,
+    pub uid: Option<u32>,
     pub scroll: u16,
 }
 
@@ -18,17 +19,20 @@ impl Reader {
     pub fn new() -> Self {
         Self {
             message: None,
+            uid: None,
             scroll: 0,
         }
     }
 
-    pub fn open(&mut self, msg: ParsedMessage) {
+    pub fn open(&mut self, uid: u32, msg: ParsedMessage) {
         self.message = Some(msg);
+        self.uid = Some(uid);
         self.scroll = 0;
     }
 
     pub fn close(&mut self) {
         self.message = None;
+        self.uid = None;
         self.scroll = 0;
     }
 }
@@ -47,6 +51,13 @@ impl Component for Reader {
             KeyCode::Char('q') | KeyCode::Esc => Action::CloseReader,
             KeyCode::Char('r') => Action::StartReply,
             KeyCode::Char('f') => Action::StartForward,
+            KeyCode::Char('d') => {
+                if let Some(uid) = self.uid {
+                    Action::ConfirmDelete(uid)
+                } else {
+                    Action::Noop
+                }
+            }
             _ => Action::Noop,
         }
     }
@@ -106,7 +117,7 @@ impl Component for Reader {
                 Block::default()
                     .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::Cyan))
-                    .title(" Reader [q:back r:reply f:forward] "),
+                    .title(" Reader [q:back r:reply f:forward d:delete] "),
             )
             .wrap(Wrap { trim: false })
             .scroll((self.scroll, 0));

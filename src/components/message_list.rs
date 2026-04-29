@@ -68,6 +68,13 @@ impl Component for MessageList {
                 }
             }
             KeyCode::Char('h') => Action::FocusMailboxes,
+            KeyCode::Char('d') => {
+                if let Some(uid) = self.selected_uid() {
+                    Action::ConfirmDelete(uid)
+                } else {
+                    Action::Noop
+                }
+            }
             _ => Action::Noop,
         }
     }
