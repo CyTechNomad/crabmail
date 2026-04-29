@@ -6,6 +6,7 @@ use std::time::{Duration, Instant};
 
 use crate::action::Action;
 use crate::auth;
+use secrecy::{ExposeSecret, SecretString};
 use crate::components::Component;
 use crate::components::command_bar::{self, CommandBar};
 use crate::components::composer::Composer;
@@ -41,7 +42,7 @@ pub struct App {
     focus: Focus,
     config: Config,
     active_account: Option<usize>,
-    cached_password: Option<String>,
+    cached_password: Option<SecretString>,
     imap: Option<ImapClient>,
     // Components
     mailbox_list: MailboxList,
@@ -374,19 +375,18 @@ impl App {
             self.status_bar.error = "Account not found".to_string();
             return;
         };
-        let password = match self.cached_password.clone() {
-            Some(p) => p,
-            None => match auth::get_password(&account.name) {
-                Ok(p) => p,
+        if self.cached_password.is_none() {
+            match auth::get_password(&account.name) {
+                Ok(p) => self.cached_password = Some(SecretString::from(p)),
                 Err(e) => {
                     self.status_bar.error = format!("Keychain error: {e}");
                     return;
                 }
-            },
-        };
-        self.cached_password = Some(password.clone());
+            }
+        }
+        let password = self.cached_password.as_ref().unwrap();
         self.status_bar.status = format!("Connecting to {}...", account.imap_host);
-        match ImapClient::connect(account, &password).await {
+        match ImapClient::connect(account, password.expose_secret()).await {
             Ok(mut client) => {
                 match client.list_mailboxes().await {
                     Ok(mailboxes) => {
@@ -451,10 +451,9 @@ impl App {
             self.status_bar.error = "No cached password".to_string();
             return;
         };
-        let password = password.clone();
         match smtp_client::send_email(
             &account,
-            &password,
+            password.expose_secret(),
             &self.composer.to,
             &self.composer.subject,
             &self.composer.body,
@@ -529,14 +528,16 @@ impl App {
 
     async fn finish_setup(&mut self) {
         let account = self.setup_wizard.build_account();
-        let password = self.setup_wizard.password().to_string();
+        let password = self.setup_wizard.password();
 
         if !password.is_empty() {
-            if let Err(e) = auth::store_password(&account.name, &password) {
+            if let Err(e) = auth::store_password(&account.name, password) {
+                self.setup_wizard.clear_password();
                 self.status_bar.error = format!("Failed to store password: {e}");
                 return;
             }
         }
+        self.setup_wizard.clear_password();
 
         // Update existing or add new
         let idx = if let Some(pos) = self

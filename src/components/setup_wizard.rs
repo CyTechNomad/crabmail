@@ -8,6 +8,7 @@ use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 use crate::action::Action;
 use crate::components::Component;
 use crate::config::Account;
+use zeroize::Zeroize;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Step {
@@ -103,6 +104,10 @@ impl SetupWizard {
 
     pub fn password(&self) -> &str {
         &self.password
+    }
+
+    pub fn clear_password(&mut self) {
+        self.password.zeroize();
     }
 }
 
