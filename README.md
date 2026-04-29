@@ -52,19 +52,48 @@ Configuration is stored at `~/.config/crabmail/config.toml`.
 
 ### Keybindings
 
-| Key       | Action                                      |
-| --------- | ------------------------------------------- |
-| `j` / `k` | Navigate down / up                          |
-| `Tab`     | Switch focus between mailboxes and messages |
-| `Enter`   | Open selected message / select mailbox      |
-| `c`       | Compose new email                           |
-| `r`       | Reply to message                            |
-| `f`       | Forward message                             |
-| `/`       | Search                                      |
-| `:`       | Command mode                                |
-| `d`       | Delete message                              |
-| `Esc`     | Back / cancel                               |
-| `q`       | Quit                                        |
+#### Normal Mode
+
+| Key         | Action                                 |
+| ----------- | -------------------------------------- |
+| `j` / `k`   | Navigate down / up                     |
+| `h` / `l`   | Focus mailboxes / messages             |
+| `Enter`     | Open selected message / select mailbox |
+| `i`         | Compose new email                      |
+| `/`         | Search                                 |
+| `:`         | Command mode                           |
+| `d`         | Delete message (press `y` to confirm)  |
+| `Esc`       | Back / cancel                          |
+| `q`         | Quit                                   |
+
+#### Reading a Message
+
+| Key         | Action              |
+| ----------- | ------------------- |
+| `j` / `k`   | Scroll down / up    |
+| `r`         | Reply to message    |
+| `f`         | Forward message     |
+| `d`         | Delete message      |
+| `q` / `Esc` | Close reader        |
+
+#### Composing
+
+| Key           | Action                              |
+| ------------- | ----------------------------------- |
+| `Tab`         | Cycle fields (To → Subject → Body) |
+| `Shift+Tab`   | Cycle fields backward               |
+| `Ctrl+w`      | Send message                        |
+| `Esc`         | Cancel compose                      |
+
+#### Commands
+
+| Command              | Action              |
+| -------------------- | ------------------- |
+| `:q` / `:quit`       | Quit                |
+| `:account <name>`    | Switch account      |
+| `:add-account`       | Add a new account   |
+| `:edit-account`      | Edit active account |
+| `:help`              | Show keybind hints  |
 
 ## Configuration
 
