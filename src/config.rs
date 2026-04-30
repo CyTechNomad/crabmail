@@ -62,6 +62,11 @@ impl Config {
         }
         let content = toml::to_string_pretty(self)?;
         fs::write(&path, content)?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let _ = fs::set_permissions(&path, fs::Permissions::from_mode(0o600));
+        }
         Ok(())
     }
 }
