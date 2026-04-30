@@ -19,6 +19,11 @@ async fn main() -> Result<()> {
         .unwrap_or(std::path::Path::new("."))
         .to_path_buf();
     let file_appender = rolling::never(&log_dir, "crabmail.log");
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let _ = std::fs::set_permissions(&log_dir, std::fs::Permissions::from_mode(0o700));
+    }
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env().add_directive("crabmail=info".parse()?))
         .with_writer(file_appender)
