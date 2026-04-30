@@ -21,6 +21,8 @@ email from your terminal with a TUI powered by
   [keyring](https://crates.io/crates/keyring) (macOS Keychain, Windows
   Credential Manager, Linux Secret Service)
 - **Setup wizard** — guided first-run account configuration
+- **Color themes** — built-in themes (default, dracula, gruvbox, nord,
+  solarized) switchable via config or `:theme` command
 - **File logging** — logs to `~/.config/crabmail/crabmail.log`, keeps your TUI
   clean
 
@@ -94,6 +96,7 @@ Configuration is stored at `~/.config/crabmail/config.toml`.
 | `:account <name>`    | Switch account      |
 | `:add-account`       | Add a new account   |
 | `:edit-account`      | Edit active account |
+| `:theme <name>`      | Switch color theme  |
 | `:help`              | Show keybind hints  |
 
 ## Configuration
@@ -103,6 +106,9 @@ Config lives at `~/.config/crabmail/config.toml`:
 ```toml
 # Auto-refresh mailbox every N seconds (optional, omit to disable)
 auto_refresh_seconds = 120
+
+# Color theme: default, dracula, gruvbox, nord, solarized
+theme = "default"
 
 [[accounts]]
 name = "Personal"
@@ -128,6 +134,7 @@ src/
 ├── imap_client.rs   # IMAP connection and mailbox operations
 ├── smtp_client.rs   # SMTP email sending
 ├── mail.rs          # Email parsing (MIME, HTML→text, attachments)
+├── theme.rs         # Color theme definitions
 └── components/
     ├── mod.rs           # Component trait
     ├── mailbox_list.rs  # Mailbox/folder sidebar
