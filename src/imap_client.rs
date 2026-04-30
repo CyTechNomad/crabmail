@@ -148,11 +148,12 @@ impl ImapClient {
     }
 
     pub async fn search(&mut self, query: &str) -> Result<Vec<u32>> {
+        let sanitized: String = query.chars().filter(|&c| c != '"' && c != '\\').collect();
         let uids: Vec<_> = self
             .session
             .uid_search(format!(
                 "OR OR FROM \"{}\" SUBJECT \"{}\" BODY \"{}\"",
-                query, query, query
+                sanitized, sanitized, sanitized
             ))
             .await?
             .into_iter()
