@@ -37,6 +37,7 @@ const STEPS: [Step; 8] = [
 pub struct SetupWizard {
     pub active: bool,
     step: usize,
+    editing: bool,
     name: String,
     email: String,
     imap_host: String,
@@ -51,6 +52,7 @@ impl SetupWizard {
         Self {
             active: false,
             step: 0,
+            editing: false,
             name: String::new(),
             email: String::new(),
             imap_host: String::new(),
@@ -64,11 +66,13 @@ impl SetupWizard {
     pub fn activate(&mut self) {
         self.active = true;
         self.step = 0;
+        self.editing = false;
     }
 
     pub fn prefill(&mut self, account: &Account) {
         self.active = true;
         self.step = 0;
+        self.editing = true;
         self.name = account.name.clone();
         self.email = account.email.clone();
         self.imap_host = account.imap_host.clone();
@@ -173,6 +177,12 @@ impl Component for SetupWizard {
         ])
         .split(inner);
 
+        let subtitle = if self.editing {
+            "Edit your account details."
+        } else {
+            "Let's set up a new account."
+        };
+
         let title = Paragraph::new(Line::from(vec![
             Span::styled(
                 "Welcome to Crabmail! ",
@@ -180,7 +190,7 @@ impl Component for SetupWizard {
                     .fg(theme.accent)
                     .add_modifier(Modifier::BOLD),
             ),
-            Span::raw("Let's set up your first account."),
+            Span::raw(subtitle),
         ]));
         frame.render_widget(title, chunks[0]);
 
