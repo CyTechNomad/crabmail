@@ -1,12 +1,13 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
-use ratatui::style::{Color, Modifier, Style};
+use ratatui::style::{Modifier, Style};
 use ratatui::widgets::{Block, Borders, List, ListItem, ListState};
 
 use crate::action::Action;
 use crate::components::Component;
 use crate::imap_client::Mailbox;
+use crate::theme::Theme;
 
 pub struct MailboxList {
     pub mailboxes: Vec<Mailbox>,
@@ -69,7 +70,7 @@ impl Component for MailboxList {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         let items: Vec<ListItem> = self
             .mailboxes
             .iter()
@@ -77,9 +78,9 @@ impl Component for MailboxList {
             .collect();
 
         let border_style = if self.focused {
-            Style::default().fg(Color::Cyan)
+            Style::default().fg(theme.accent)
         } else {
-            Style::default().fg(Color::DarkGray)
+            Style::default().fg(theme.dimmed)
         };
 
         let list = List::new(items)
@@ -91,7 +92,7 @@ impl Component for MailboxList {
             )
             .highlight_style(
                 Style::default()
-                    .fg(Color::Cyan)
+                    .fg(theme.accent)
                     .add_modifier(Modifier::BOLD),
             )
             .highlight_symbol("▸ ");

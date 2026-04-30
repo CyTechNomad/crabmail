@@ -1,13 +1,14 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Modifier, Style};
+use ratatui::style::{Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 
 use crate::action::Action;
 use crate::components::Component;
 use crate::config::Account;
+use crate::theme::Theme;
 use zeroize::Zeroize;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -153,13 +154,13 @@ impl Component for SetupWizard {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         if !self.active {
             return;
         }
         let outer = Block::default()
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::Cyan))
+            .border_style(Style::default().fg(theme.accent))
             .title(" 🦀 Crabmail Setup ");
 
         let inner = outer.inner(area);
@@ -176,7 +177,7 @@ impl Component for SetupWizard {
             Span::styled(
                 "Welcome to Crabmail! ",
                 Style::default()
-                    .fg(Color::Cyan)
+                    .fg(theme.accent)
                     .add_modifier(Modifier::BOLD),
             ),
             Span::raw("Let's set up your first account."),
@@ -202,11 +203,11 @@ impl Component for SetupWizard {
                 value.to_string()
             };
             let style = if i == self.step {
-                Style::default().fg(Color::Cyan)
+                Style::default().fg(theme.accent)
             } else if i < self.step {
-                Style::default().fg(Color::Green)
+                Style::default().fg(theme.success)
             } else {
-                Style::default().fg(Color::DarkGray)
+                Style::default().fg(theme.dimmed)
             };
             lines.push(Line::from(Span::styled(
                 format!("{marker}{label}: {display}"),
@@ -218,7 +219,7 @@ impl Component for SetupWizard {
             lines.push(Line::from(""));
             lines.push(Line::from(Span::styled(
                 "  Press Enter to save and connect, Esc to cancel.",
-                Style::default().fg(Color::Yellow),
+                Style::default().fg(theme.search),
             )));
         }
 
@@ -226,7 +227,7 @@ impl Component for SetupWizard {
         frame.render_widget(body, chunks[1]);
 
         let hint = Paragraph::new("Enter: next  Shift+Tab: back  Esc: quit")
-            .style(Style::default().fg(Color::DarkGray));
+            .style(Style::default().fg(theme.dimmed));
         frame.render_widget(hint, chunks[2]);
     }
 }

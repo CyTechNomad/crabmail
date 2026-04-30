@@ -1,11 +1,12 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
-use ratatui::style::{Color, Style};
+use ratatui::style::Style;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::action::Action;
 use crate::components::Component;
+use crate::theme::Theme;
 
 pub struct Search {
     pub input: String,
@@ -62,16 +63,16 @@ impl Component for Search {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         if !self.active {
             return;
         }
         let p = Paragraph::new(format!("/{}", self.input))
-            .style(Style::default().fg(Color::Yellow))
+            .style(Style::default().fg(theme.search))
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Yellow))
+                    .border_style(Style::default().fg(theme.search))
                     .title(" Search "),
             );
         frame.render_widget(p, area);

@@ -2,13 +2,14 @@ use chrono::{DateTime, Datelike, Local};
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Rect};
-use ratatui::style::{Color, Modifier, Style};
+use ratatui::style::{Modifier, Style};
 use ratatui::text::Text;
 use ratatui::widgets::{Block, Borders, Cell, Row, Table, TableState};
 
 use crate::action::Action;
 use crate::components::Component;
 use crate::imap_client::MessageSummary;
+use crate::theme::Theme;
 
 pub struct MessageList {
     pub messages: Vec<MessageSummary>,
@@ -81,7 +82,7 @@ impl Component for MessageList {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         let rows: Vec<Row> = self
             .messages
             .iter()
@@ -103,9 +104,9 @@ impl Component for MessageList {
             .collect();
 
         let border_style = if self.focused {
-            Style::default().fg(Color::Cyan)
+            Style::default().fg(theme.accent)
         } else {
-            Style::default().fg(Color::DarkGray)
+            Style::default().fg(theme.dimmed)
         };
 
         let widths = [
@@ -125,11 +126,11 @@ impl Component for MessageList {
             )
             .header(
                 Row::new(vec!["", "From", "Subject", "Date", ""])
-                    .style(Style::default().fg(Color::DarkGray)),
+                    .style(Style::default().fg(theme.dimmed)),
             )
             .row_highlight_style(
                 Style::default()
-                    .fg(Color::Cyan)
+                    .fg(theme.accent)
                     .add_modifier(Modifier::BOLD),
             );
 

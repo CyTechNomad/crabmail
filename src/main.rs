@@ -6,6 +6,7 @@ mod config;
 mod imap_client;
 mod mail;
 mod smtp_client;
+mod theme;
 
 use anyhow::Result;
 use tracing_appender::rolling;

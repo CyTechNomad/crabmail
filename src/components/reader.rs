@@ -1,13 +1,14 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
-use ratatui::style::{Color, Modifier, Style};
+use ratatui::style::{Modifier, Style};
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 
 use crate::action::Action;
 use crate::components::Component;
 use crate::mail::ParsedMessage;
+use crate::theme::Theme;
 
 pub struct Reader {
     pub message: Option<ParsedMessage>,
@@ -62,7 +63,7 @@ impl Component for Reader {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         let Some(msg) = &self.message else {
             let p = Paragraph::new("No message selected")
                 .block(Block::default().borders(Borders::ALL).title(" Reader "));
@@ -118,7 +119,7 @@ impl Component for Reader {
             .block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Cyan))
+                    .border_style(Style::default().fg(theme.accent))
                     .title(" Reader [q:back r:reply f:forward d:delete] "),
             )
             .wrap(Wrap { trim: false })

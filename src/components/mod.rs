@@ -12,6 +12,7 @@ use ratatui::Frame;
 use ratatui::layout::Rect;
 
 use crate::action::Action;
+use crate::theme::Theme;
 
 pub trait Component {
     fn handle_key_event(&mut self, key: KeyEvent) -> Action {
@@ -21,5 +22,5 @@ pub trait Component {
     fn update(&mut self, action: &Action) {
         let _ = action;
     }
-    fn render(&self, frame: &mut Frame, area: Rect);
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme);
 }

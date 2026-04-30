@@ -33,6 +33,8 @@ pub struct Config {
     pub accounts: Vec<Account>,
     #[serde(default)]
     pub auto_refresh_seconds: Option<u64>,
+    #[serde(default)]
+    pub theme: Option<String>,
 }
 
 impl Config {

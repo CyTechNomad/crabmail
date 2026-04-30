@@ -1,11 +1,12 @@
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::Frame;
 use ratatui::layout::Rect;
-use ratatui::style::{Color, Style};
+use ratatui::style::Style;
 use ratatui::widgets::Paragraph;
 
 use crate::action::Action;
 use crate::components::Component;
+use crate::theme::Theme;
 
 pub struct CommandBar {
     pub input: String,
@@ -58,12 +59,12 @@ impl Component for CommandBar {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         if !self.active {
             return;
         }
         let p = Paragraph::new(format!(":{}", self.input))
-            .style(Style::default().fg(Color::White).bg(Color::DarkGray));
+            .style(Style::default().fg(theme.text).bg(theme.bar_bg));
         frame.render_widget(p, area);
         frame.set_cursor_position((area.x + 1 + self.input.len() as u16, area.y));
     }
@@ -85,6 +86,16 @@ pub fn parse_command(input: &str) -> Action {
         ),
         Some("edit-account") => Action::EditAccount,
         Some("add-account") => Action::AddAccount,
+        Some("theme") => {
+            if let Some(name) = parts.get(1) {
+                Action::SetTheme(name.to_string())
+            } else {
+                Action::SetStatus(format!(
+                    "Themes: {}",
+                    crate::theme::Theme::available().join(", ")
+                ))
+            }
+        }
         Some(other) => Action::SetError(format!("Unknown command: {other}")),
         None => Action::Noop,
     }

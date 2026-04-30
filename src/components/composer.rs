@@ -1,12 +1,12 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::style::{Color, Style};
+use ratatui::style::Style;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::action::Action;
 use crate::components::Component;
-
+use crate::theme::Theme;
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum Field {
     To,
@@ -105,7 +105,7 @@ impl Component for Composer {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect) {
+    fn render(&self, frame: &mut Frame, area: Rect, theme: &Theme) {
         let chunks = Layout::vertical([
             Constraint::Length(3),
             Constraint::Length(3),
@@ -115,9 +115,9 @@ impl Component for Composer {
 
         let make_block = |title: &str, active: bool| {
             let style = if active {
-                Style::default().fg(Color::Cyan)
+                Style::default().fg(theme.accent)
             } else {
-                Style::default().fg(Color::DarkGray)
+                Style::default().fg(theme.dimmed)
             };
             Block::default()
                 .borders(Borders::ALL)

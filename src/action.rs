@@ -41,4 +41,6 @@ pub enum Action {
     SetError(String),
     // Mode
     EnterNormal,
+    // Theme
+    SetTheme(String),
 }

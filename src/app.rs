@@ -20,6 +20,7 @@ use crate::config::Config;
 use crate::imap_client::ImapClient;
 use crate::mail;
 use crate::smtp_client;
+use crate::theme::Theme;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Mode {
@@ -41,6 +42,7 @@ pub struct App {
     mode: Mode,
     focus: Focus,
     config: Config,
+    theme: Theme,
     active_account: Option<usize>,
     cached_password: Option<SecretString>,
     imap: Option<ImapClient>,
@@ -60,10 +62,12 @@ pub struct App {
 
 impl App {
     pub fn new(config: Config) -> Self {
+        let theme = Theme::from_name(config.theme.as_deref().unwrap_or("default"));
         Self {
             mode: Mode::Normal,
             focus: Focus::Mailboxes,
             config,
+            theme,
             active_account: None,
             cached_password: None,
             imap: None,
@@ -311,21 +315,29 @@ impl App {
                 self.status_bar.status = s;
             }
             Action::SetError(_) | Action::Resize(_, _) | Action::Key(_) => {}
+            Action::SetTheme(name) => {
+                self.theme = Theme::from_name(&name);
+                self.config.theme = Some(name.clone());
+                let _ = self.config.save();
+                self.status_bar
+                    .set_temporary_status(&format!("Theme: {name}"), Duration::from_secs(2));
+            }
         }
     }
 
     fn render(&self, frame: &mut ratatui::Frame) {
         let area = frame.area();
+        let t = &self.theme;
 
         if self.mode == Mode::Setup {
-            self.setup_wizard.render(frame, area);
+            self.setup_wizard.render(frame, area, t);
             return;
         }
 
         if self.mode == Mode::Compose {
             let chunks = Layout::vertical([Constraint::Fill(1), Constraint::Length(1)]).split(area);
-            self.composer.render(frame, chunks[0]);
-            self.status_bar.render(frame, chunks[1]);
+            self.composer.render(frame, chunks[0], t);
+            self.status_bar.render(frame, chunks[1], t);
             return;
         }
 
@@ -346,25 +358,25 @@ impl App {
         let content_area = main_chunks[0];
 
         if self.mode == Mode::Reading {
-            self.reader.render(frame, content_area);
+            self.reader.render(frame, content_area, t);
         } else {
             // Two-pane: mailboxes | messages
             let panes = Layout::horizontal([Constraint::Length(25), Constraint::Fill(1)])
                 .split(content_area);
-            self.mailbox_list.render(frame, panes[0]);
-            self.message_list.render(frame, panes[1]);
+            self.mailbox_list.render(frame, panes[0], t);
+            self.message_list.render(frame, panes[1], t);
         }
 
         // Overlay (search or command)
         if has_overlay {
             if self.search.active {
-                self.search.render(frame, main_chunks[1]);
+                self.search.render(frame, main_chunks[1], t);
             } else {
-                self.command_bar.render(frame, main_chunks[1]);
+                self.command_bar.render(frame, main_chunks[1], t);
             }
-            self.status_bar.render(frame, main_chunks[2]);
+            self.status_bar.render(frame, main_chunks[2], t);
         } else {
-            self.status_bar.render(frame, main_chunks[1]);
+            self.status_bar.render(frame, main_chunks[1], t);
         }
     }
 
