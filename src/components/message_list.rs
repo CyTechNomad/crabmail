@@ -125,8 +125,14 @@ impl Component for MessageList {
                     .title(" Messages "),
             )
             .header(
-                Row::new(vec!["", "From", "Subject", "Date", ""])
-                    .style(Style::default().fg(theme.dimmed)),
+                Row::new(vec![
+                    Cell::new(""),
+                    Cell::new("From"),
+                    Cell::new("Subject"),
+                    Cell::new(Text::from("Date").alignment(Alignment::Right)),
+                    Cell::new(""),
+                ])
+                .style(Style::default().fg(theme.dimmed)),
             )
             .row_highlight_style(
                 Style::default()
