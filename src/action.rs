@@ -32,6 +32,7 @@ pub enum Action {
     EditAccount,
     AddAccount,
     // Message actions
+    MarkRead(u32),
     DeleteMessage(u32),
     ConfirmDelete(u32),
     // Refresh

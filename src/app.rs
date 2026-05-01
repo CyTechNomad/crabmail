@@ -191,6 +191,12 @@ impl App {
             }
             Action::OpenMessage(uid) => {
                 self.open_message(uid).await;
+                if self.mode == Mode::Reading {
+                    self.mark_read(uid).await;
+                }
+            }
+            Action::MarkRead(uid) => {
+                self.mark_read(uid).await;
             }
             Action::CloseReader => {
                 self.mode = Mode::Normal;
@@ -450,6 +456,17 @@ impl App {
                 Err(e) => self.status_bar.error = format!("Parse error: {e}"),
             },
             Err(e) => self.status_bar.error = format!("Fetch error: {e}"),
+        }
+    }
+
+    async fn mark_read(&mut self, uid: u32) {
+        if let Some(imap) = &mut self.imap {
+            let _ = imap.mark_read(uid).await;
+        }
+        if let Some(msg) = self.message_list.messages.iter_mut().find(|m| m.uid == uid) {
+            if !msg.flags.iter().any(|f| f.contains("Seen")) {
+                msg.flags.push("Seen".to_string());
+            }
         }
     }
 

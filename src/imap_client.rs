@@ -198,6 +198,15 @@ impl ImapClient {
         Ok(summaries)
     }
 
+    pub async fn mark_read(&mut self, uid: u32) -> Result<()> {
+        self.session
+            .uid_store(uid.to_string(), "+FLAGS (\\Seen)")
+            .await?
+            .try_collect::<Vec<_>>()
+            .await?;
+        Ok(())
+    }
+
     pub async fn delete_message(&mut self, uid: u32) -> Result<()> {
         self.session
             .uid_store(uid.to_string(), "+FLAGS (\\Deleted)")

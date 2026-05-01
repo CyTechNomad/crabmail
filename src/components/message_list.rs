@@ -87,10 +87,12 @@ impl Component for MessageList {
             .messages
             .iter()
             .map(|m| {
-                let flag = if m.flags.iter().any(|f| f.contains("Seen")) {
-                    " "
+                let seen = m.flags.iter().any(|f| f.contains("Seen"));
+                let flag = if seen { " " } else { "●" };
+                let style = if seen {
+                    Style::default()
                 } else {
-                    "●"
+                    Style::default().add_modifier(Modifier::BOLD)
                 };
                 let (date, time) = format_date(&m.date);
                 Row::new(vec![
@@ -100,6 +102,7 @@ impl Component for MessageList {
                     Cell::new(Text::from(date).alignment(Alignment::Right)),
                     Cell::new(time),
                 ])
+                .style(style)
             })
             .collect();
 
