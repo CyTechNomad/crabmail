@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor};
+use zeroize::Zeroize;
 
 use crate::config::Account;
 
@@ -20,7 +21,9 @@ pub async fn send_email(
         .body(body.to_string())
         .context("Failed to build email")?;
 
-    let creds = Credentials::new(account.email.clone(), password.to_string());
+    let mut pw = password.to_string();
+    let creds = Credentials::new(account.email.clone(), pw.clone());
+    pw.zeroize();
 
     let mailer = if account.smtp_port == 465 {
         AsyncSmtpTransport::<Tokio1Executor>::relay(&account.smtp_host)?
@@ -34,6 +37,7 @@ pub async fn send_email(
             .build()
     };
 
-    mailer.send(email).await.context("Failed to send email")?;
-    Ok(())
+    let result = mailer.send(email).await.context("Failed to send email");
+    drop(mailer);
+    result.map(|_| ())
 }
