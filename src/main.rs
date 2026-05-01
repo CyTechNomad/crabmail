@@ -24,6 +24,10 @@ async fn main() -> Result<()> {
     {
         use std::os::unix::fs::PermissionsExt;
         let _ = std::fs::set_permissions(&log_dir, std::fs::Permissions::from_mode(0o700));
+        let _ = std::fs::set_permissions(
+            log_dir.join("crabmail.log"),
+            std::fs::Permissions::from_mode(0o600),
+        );
     }
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env().add_directive("crabmail=info".parse()?))
