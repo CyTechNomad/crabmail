@@ -100,7 +100,7 @@ impl App {
 
             if self.should_quit {
                 if let Some(imap) = &mut self.imap {
-                    let _ = imap.logout().await;
+                    let _ = tokio::time::timeout(Duration::from_secs(2), imap.logout()).await;
                 }
                 break;
             }
