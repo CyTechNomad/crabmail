@@ -4,6 +4,8 @@ A terminal-based email client written in Rust. Read, compose, search, and manage
 email from your terminal with a TUI powered by
 [ratatui](https://github.com/ratatui/ratatui).
 
+![Mailboxes](assets/Mailboxes.png)
+
 ## Features
 
 - **IMAP support** — connect to any IMAP server (Gmail, Outlook, Fastmail,
@@ -52,6 +54,8 @@ cargo run
 On first launch, the setup wizard will walk you through adding an account.
 Configuration is stored at `~/.config/crabmail/config.toml`.
 
+![Account Setup](assets/AccountSetup.png)
+
 ### Keybindings
 
 #### Normal Mode
@@ -88,6 +92,8 @@ Configuration is stored at `~/.config/crabmail/config.toml`.
 | `Ctrl+w`      | Send message                        |
 | `Esc`         | Cancel compose                      |
 
+![Composer](assets/Composer.png)
+
 #### Commands
 
 | Command              | Action              |
@@ -119,6 +125,8 @@ smtp_host = "smtp.example.com"
 smtp_port = 587
 use_tls = true
 ```
+
+![Theme Support](assets/ThemeSupport.png)
 
 Passwords are stored in your OS keychain, not in the config file.
 
