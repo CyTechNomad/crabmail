@@ -41,11 +41,11 @@ impl StatusBar {
     }
 
     pub fn tick(&mut self) {
-        if let Some(expires) = self.status_expires {
-            if Instant::now() >= expires {
-                self.status.clear();
-                self.status_expires = None;
-            }
+        if let Some(expires) = self.status_expires
+            && Instant::now() >= expires
+        {
+            self.status.clear();
+            self.status_expires = None;
         }
     }
 }
@@ -74,7 +74,10 @@ impl Component for StatusBar {
             Mode::Command => " COMMAND ",
             Mode::Setup => " SETUP ",
         };
-        let mode_span = Span::styled(mode_str, Style::default().fg(theme.mode_fg).bg(theme.accent));
+        let mode_span = Span::styled(
+            mode_str,
+            Style::default().fg(theme.mode_fg).bg(theme.accent),
+        );
         let acct = if self.account.is_empty() {
             "No account".to_string()
         } else {
@@ -89,7 +92,10 @@ impl Component for StatusBar {
         let mb_span = Span::styled(mb, Style::default().fg(theme.dimmed));
 
         let right = if !self.error.is_empty() {
-            Span::styled(format!(" {} ", self.error), Style::default().fg(theme.error))
+            Span::styled(
+                format!(" {} ", self.error),
+                Style::default().fg(theme.error),
+            )
         } else if !self.status.is_empty() {
             Span::styled(
                 format!(" {} ", self.status),

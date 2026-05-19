@@ -1,6 +1,9 @@
 use crossterm::event::KeyEvent;
 
+// Some variants are matched but not yet constructed — they exist as scaffolding
+// for a future decoupled event dispatch architecture.
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub enum Action {
     Quit,
     Noop,

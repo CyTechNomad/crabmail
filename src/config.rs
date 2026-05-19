@@ -49,16 +49,14 @@ impl Config {
     pub fn load() -> Result<Self> {
         let path = Self::path();
         // Migrate from old platform-specific location if needed
-        if !path.exists() {
-            if let Some(old) = dirs::config_dir().map(|d| d.join("crabmail").join("config.toml"))
-            {
-                if old.exists() {
-                    if let Some(parent) = path.parent() {
-                        fs::create_dir_all(parent)?;
-                    }
-                    fs::copy(&old, &path)?;
-                }
+        if !path.exists()
+            && let Some(old) = dirs::config_dir().map(|d| d.join("crabmail").join("config.toml"))
+            && old.exists()
+        {
+            if let Some(parent) = path.parent() {
+                fs::create_dir_all(parent)?;
             }
+            fs::copy(&old, &path)?;
         }
         if !path.exists() {
             let config = Config::default();

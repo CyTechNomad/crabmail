@@ -40,6 +40,7 @@ pub struct MailboxInfo {
 
 #[derive(Debug, Clone)]
 pub struct MessageSummary {
+    #[allow(dead_code)] // Retained for future IMAP sequence-based operations
     pub seq: u32,
     pub uid: u32,
     pub from: String,

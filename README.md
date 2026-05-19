@@ -60,50 +60,50 @@ Configuration is stored at `~/.config/crabmail/config.toml`.
 
 #### Normal Mode
 
-| Key         | Action                                 |
-| ----------- | -------------------------------------- |
-| `j` / `k`   | Navigate down / up                     |
-| `h` / `l`   | Focus mailboxes / messages             |
-| `Enter`     | Open selected message / select mailbox |
-| `i`         | Compose new email                      |
-| `/`         | Search                                 |
-| `:`         | Command mode                           |
-| `r`         | Refresh mailbox                        |
-| `d`         | Delete message (press `y` to confirm)  |
-| `Esc`       | Back / cancel                          |
-| `q`         | Quit                                   |
+| Key       | Action                                 |
+| --------- | -------------------------------------- |
+| `j` / `k` | Navigate down / up                     |
+| `h` / `l` | Focus mailboxes / messages             |
+| `Enter`   | Open selected message / select mailbox |
+| `i`       | Compose new email                      |
+| `/`       | Search                                 |
+| `:`       | Command mode                           |
+| `r`       | Refresh mailbox                        |
+| `d`       | Delete message (press `y` to confirm)  |
+| `Esc`     | Back / cancel                          |
+| `q`       | Quit                                   |
 
 #### Reading a Message
 
-| Key         | Action              |
-| ----------- | ------------------- |
-| `j` / `k`   | Scroll down / up    |
-| `r`         | Reply to message    |
-| `f`         | Forward message     |
-| `d`         | Delete message      |
-| `q` / `Esc` | Close reader        |
+| Key         | Action           |
+| ----------- | ---------------- |
+| `j` / `k`   | Scroll down / up |
+| `r`         | Reply to message |
+| `f`         | Forward message  |
+| `d`         | Delete message   |
+| `q` / `Esc` | Close reader     |
 
 #### Composing
 
-| Key           | Action                              |
-| ------------- | ----------------------------------- |
-| `Tab`         | Cycle fields (To → Subject → Body) |
-| `Shift+Tab`   | Cycle fields backward               |
-| `Ctrl+w`      | Send message                        |
-| `Esc`         | Cancel compose                      |
+| Key         | Action                             |
+| ----------- | ---------------------------------- |
+| `Tab`       | Cycle fields (To → Subject → Body) |
+| `Shift+Tab` | Cycle fields backward              |
+| `Ctrl+w`    | Send message                       |
+| `Esc`       | Cancel compose                     |
 
 ![Composer](assets/Composer.png)
 
 #### Commands
 
-| Command              | Action              |
-| -------------------- | ------------------- |
-| `:q` / `:quit`       | Quit                |
-| `:account <name>`    | Switch account      |
-| `:add-account`       | Add a new account   |
-| `:edit-account`      | Edit active account |
-| `:theme <name>`      | Switch color theme  |
-| `:help`              | Show keybind hints  |
+| Command           | Action              |
+| ----------------- | ------------------- |
+| `:q` / `:quit`    | Quit                |
+| `:account <name>` | Switch account      |
+| `:add-account`    | Add a new account   |
+| `:edit-account`   | Edit active account |
+| `:theme <name>`   | Switch color theme  |
+| `:help`           | Show keybind hints  |
 
 ## Configuration
 

@@ -149,7 +149,11 @@ impl Component for MessageList {
 
 fn truncate(s: &str, max: usize) -> String {
     if s.chars().count() > max {
-        let end = s.char_indices().nth(max - 1).map(|(i, _)| i).unwrap_or(s.len());
+        let end = s
+            .char_indices()
+            .nth(max - 1)
+            .map(|(i, _)| i)
+            .unwrap_or(s.len());
         format!("{}…", &s[..end])
     } else {
         s.to_string()

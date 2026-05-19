@@ -6,7 +6,6 @@ use std::time::{Duration, Instant};
 
 use crate::action::Action;
 use crate::auth;
-use secrecy::{ExposeSecret, SecretString};
 use crate::components::Component;
 use crate::components::command_bar::{self, CommandBar};
 use crate::components::composer::Composer;
@@ -21,6 +20,7 @@ use crate::imap_client::ImapClient;
 use crate::mail;
 use crate::smtp_client;
 use crate::theme::Theme;
+use secrecy::{ExposeSecret, SecretString};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Mode {
@@ -113,11 +113,12 @@ impl App {
                 }
                 let action = self.handle_key(key);
                 self.process_action(action).await;
-            } else if let Some(secs) = self.config.auto_refresh_seconds {
-                if secs > 0 && self.last_refresh.elapsed() >= Duration::from_secs(secs) {
-                    self.last_refresh = Instant::now();
-                    self.process_action(Action::RefreshMailbox).await;
-                }
+            } else if let Some(secs) = self.config.auto_refresh_seconds
+                && secs > 0
+                && self.last_refresh.elapsed() >= Duration::from_secs(secs)
+            {
+                self.last_refresh = Instant::now();
+                self.process_action(Action::RefreshMailbox).await;
             }
         }
         Ok(())
@@ -141,7 +142,8 @@ impl App {
                 self.pending_confirm.take().unwrap()
             } else {
                 self.pending_confirm = None;
-                self.status_bar.set_temporary_status("Cancelled", Duration::from_secs(2));
+                self.status_bar
+                    .set_temporary_status("Cancelled", Duration::from_secs(2));
                 Action::Noop
             };
         }
@@ -409,7 +411,8 @@ impl App {
                 match client.list_mailboxes().await {
                     Ok(mailboxes) => {
                         self.mailbox_list.set_mailboxes(mailboxes);
-                        self.status_bar.set_temporary_status("Connected", Duration::from_secs(2));
+                        self.status_bar
+                            .set_temporary_status("Connected", Duration::from_secs(2));
                     }
                     Err(e) => {
                         self.status_bar.error = format!("Failed to list mailboxes: {e}");
@@ -433,10 +436,8 @@ impl App {
                 match imap.fetch_headers(50).await {
                     Ok(msgs) => {
                         self.message_list.set_messages(msgs);
-                        self.status_bar.set_temporary_status(
-                            "Refreshed",
-                            Duration::from_secs(2),
-                        );
+                        self.status_bar
+                            .set_temporary_status("Refreshed", Duration::from_secs(2));
                     }
                     Err(e) => self.status_bar.error = format!("Fetch error: {e}"),
                 }
@@ -460,16 +461,16 @@ impl App {
     }
 
     async fn mark_read(&mut self, uid: u32) {
-        if let Some(imap) = &mut self.imap {
-            if let Err(e) = imap.mark_read(uid).await {
-                self.status_bar.error = format!("Mark read failed: {e}");
-                return;
-            }
+        if let Some(imap) = &mut self.imap
+            && let Err(e) = imap.mark_read(uid).await
+        {
+            self.status_bar.error = format!("Mark read failed: {e}");
+            return;
         }
-        if let Some(msg) = self.message_list.messages.iter_mut().find(|m| m.uid == uid) {
-            if !msg.flags.iter().any(|f| f.contains("Seen")) {
-                msg.flags.push("Seen".to_string());
-            }
+        if let Some(msg) = self.message_list.messages.iter_mut().find(|m| m.uid == uid)
+            && !msg.flags.iter().any(|f| f.contains("Seen"))
+        {
+            msg.flags.push("Seen".to_string());
         }
     }
 
@@ -493,7 +494,8 @@ impl App {
         .await
         {
             Ok(()) => {
-                self.status_bar.set_temporary_status("Message sent!", Duration::from_secs(2));
+                self.status_bar
+                    .set_temporary_status("Message sent!", Duration::from_secs(2));
                 self.composer.clear();
             }
             Err(e) => self.status_bar.error = format!("Send failed: {e}"),
@@ -504,7 +506,8 @@ impl App {
         let Some(imap) = &mut self.imap else { return };
         match imap.delete_message(uid).await {
             Ok(()) => {
-                self.status_bar.set_temporary_status("Message deleted", Duration::from_secs(2));
+                self.status_bar
+                    .set_temporary_status("Message deleted", Duration::from_secs(2));
                 if self.mode == Mode::Reading {
                     self.mode = Mode::Normal;
                     self.reader.close();
@@ -523,7 +526,8 @@ impl App {
         match imap.search(query).await {
             Ok(uids) => {
                 if uids.is_empty() {
-                    self.status_bar.set_temporary_status("No results", Duration::from_secs(2));
+                    self.status_bar
+                        .set_temporary_status("No results", Duration::from_secs(2));
                     self.message_list.set_messages(vec![]);
                     return;
                 }
@@ -562,12 +566,12 @@ impl App {
         let account = self.setup_wizard.build_account();
         let password = self.setup_wizard.password();
 
-        if !password.is_empty() {
-            if let Err(e) = auth::store_password(&account.name, password) {
-                self.setup_wizard.clear_password();
-                self.status_bar.error = format!("Failed to store password: {e}");
-                return;
-            }
+        if !password.is_empty()
+            && let Err(e) = auth::store_password(&account.name, password)
+        {
+            self.setup_wizard.clear_password();
+            self.status_bar.error = format!("Failed to store password: {e}");
+            return;
         }
         self.setup_wizard.clear_password();
 
