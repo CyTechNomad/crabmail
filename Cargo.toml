@@ -28,7 +28,7 @@ toml = "0.8"
 dirs = "6"
 
 # Credentials
-keyring = { version = "3", features = ["apple-native"] }
+keyring = "3"
 secrecy = "0.10"
 zeroize = "1"
 
@@ -44,3 +44,12 @@ anyhow = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-appender = "0.2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", features = ["apple-native"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+keyring = { version = "3", features = ["linux-native"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+keyring = { version = "3", features = ["windows-native"] }
