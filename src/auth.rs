@@ -20,6 +20,7 @@ pub fn get_password(account_name: &str) -> Result<String> {
         .with_context(|| format!("No password found for {account_name}"))
 }
 
+#[allow(dead_code)] // Will be used when account deletion is implemented
 pub fn delete_password(account_name: &str) -> Result<()> {
     let entry = Entry::new(SERVICE, account_name)
         .with_context(|| format!("Failed to create keyring entry for {account_name}"))?;

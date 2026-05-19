@@ -113,11 +113,12 @@ impl App {
                 }
                 let action = self.handle_key(key);
                 self.process_action(action).await;
-            } else if let Some(secs) = self.config.auto_refresh_seconds {
-                if secs > 0 && self.last_refresh.elapsed() >= Duration::from_secs(secs) {
-                    self.last_refresh = Instant::now();
-                    self.process_action(Action::RefreshMailbox).await;
-                }
+            } else if let Some(secs) = self.config.auto_refresh_seconds
+                && secs > 0
+                && self.last_refresh.elapsed() >= Duration::from_secs(secs)
+            {
+                self.last_refresh = Instant::now();
+                self.process_action(Action::RefreshMailbox).await;
             }
         }
         Ok(())
@@ -460,16 +461,16 @@ impl App {
     }
 
     async fn mark_read(&mut self, uid: u32) {
-        if let Some(imap) = &mut self.imap {
-            if let Err(e) = imap.mark_read(uid).await {
-                self.status_bar.error = format!("Mark read failed: {e}");
-                return;
-            }
+        if let Some(imap) = &mut self.imap
+            && let Err(e) = imap.mark_read(uid).await
+        {
+            self.status_bar.error = format!("Mark read failed: {e}");
+            return;
         }
-        if let Some(msg) = self.message_list.messages.iter_mut().find(|m| m.uid == uid) {
-            if !msg.flags.iter().any(|f| f.contains("Seen")) {
-                msg.flags.push("Seen".to_string());
-            }
+        if let Some(msg) = self.message_list.messages.iter_mut().find(|m| m.uid == uid)
+            && !msg.flags.iter().any(|f| f.contains("Seen"))
+        {
+            msg.flags.push("Seen".to_string());
         }
     }
 
@@ -565,12 +566,12 @@ impl App {
         let account = self.setup_wizard.build_account();
         let password = self.setup_wizard.password();
 
-        if !password.is_empty() {
-            if let Err(e) = auth::store_password(&account.name, password) {
-                self.setup_wizard.clear_password();
-                self.status_bar.error = format!("Failed to store password: {e}");
-                return;
-            }
+        if !password.is_empty()
+            && let Err(e) = auth::store_password(&account.name, password)
+        {
+            self.setup_wizard.clear_password();
+            self.status_bar.error = format!("Failed to store password: {e}");
+            return;
         }
         self.setup_wizard.clear_password();
 

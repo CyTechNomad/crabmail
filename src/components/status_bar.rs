@@ -41,11 +41,11 @@ impl StatusBar {
     }
 
     pub fn tick(&mut self) {
-        if let Some(expires) = self.status_expires {
-            if Instant::now() >= expires {
-                self.status.clear();
-                self.status_expires = None;
-            }
+        if let Some(expires) = self.status_expires
+            && Instant::now() >= expires
+        {
+            self.status.clear();
+            self.status_expires = None;
         }
     }
 }
