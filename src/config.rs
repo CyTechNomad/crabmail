@@ -50,8 +50,7 @@ impl Config {
         let path = Self::path();
         // Migrate from old platform-specific location if needed
         if !path.exists() {
-            if let Some(old) = dirs::config_dir().map(|d| d.join("crabmail").join("config.toml"))
-            {
+            if let Some(old) = dirs::config_dir().map(|d| d.join("crabmail").join("config.toml")) {
                 if old.exists() {
                     if let Some(parent) = path.parent() {
                         fs::create_dir_all(parent)?;
